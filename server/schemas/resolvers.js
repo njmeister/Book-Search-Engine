@@ -46,25 +46,35 @@ const resolvers = {
 			return { token, user };
 		},
 
-		saveBook: async (parent, { user, body }) => {
-			console.log(user);
+		saveBook: async (parent, { userId, bookId, authors, description, title, image, link }) => {
 			try {
-				const updatedUser = await User.findOneAndUpdate(
-					{ _id: user._id },
-					{ $addToSet: { savedBooks: body } },
-					{ new: true, runValidators: true }
-				);
-				return updatedUser;
+			  const updatedUser = await User.findOneAndUpdate(
+				{ _id: userId },
+				{ 
+				  $addToSet: { 
+					savedBooks: {
+					  bookId,
+					  authors,
+					  description,
+					  title,
+					  image,
+					  link
+					} 
+				  } 
+				},
+				{ new: true, runValidators: true }
+			  );
+			  return updatedUser;
 			} catch (err) {
-				console.log(err);
-				throw new Error('Could not save book');
+			  console.log(err);
+			  throw new Error('Could not save book');
 			}
 		},
 
-		removeBook: async (parent, { user, params }) => {
+		removeBook: async (parent, { userId, bookId }) => {
 			const updatedUser = await User.findOneAndUpdate(
-				{ _id: user._id },
-				{ $pull: { savedBooks: { bookId: params.bookId } } },
+				{ _id: userId },
+				{ $pull: { savedBooks: { bookId: bookId } } },
 				{ new: true }
 			);
 			if (!updatedUser) {
