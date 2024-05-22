@@ -12,13 +12,14 @@ const SavedBooks = () => {
 
 	const token = Auth.loggedIn() ? Auth.getToken() : null;
 	const decoded = jwtDecode(token);
+	const userId = decoded.data._id;
 
 	console.log('Decoded: ', decoded);
-	console.log('User ID: ', decoded.data._id);
+	console.log('User ID: ', userId);
 
 	const [userData, setUserData] = useState({});
 	const { loading, data } = useQuery(GET_ME, {
-		variables: { userId: decoded.data._id},
+		variables: { userId: userId },
 	});
 
 	useEffect(() => {
@@ -31,6 +32,8 @@ const SavedBooks = () => {
 
 	// use this to determine if `useEffect()` hook needs to run again
 	const userDataLength = Object.keys(userData).length;
+
+	const [removeBook] = useMutation(REMOVE_BOOK);
 
 	// useEffect(() => {
 	// 	const getUserData = async () => {
@@ -58,21 +61,16 @@ const SavedBooks = () => {
 	// }, [userDataLength]);
 
 	// create function that accepts the book's mongo _id value as param and deletes the book from the database
-	const handleDeleteBook = async (bookId) => {
-		const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-		if (!token) {
-			return false;
-		}
+	const handleRemoveBook = async (bookId) => {
 
 		try {
-			const response = await deleteBook(bookId, token);
+			const { data }= await removeBook({
+				variables: { userId: userId, bookId: bookId }
+			});
 
-			if (!response.ok) {
-				throw new Error('something went wrong!');
-			}
+			console.log('Data: ', data);
 
-			const updatedUser = await response.json();
+			const updatedUser = data.removeBook;
 			setUserData(updatedUser);
 			// upon success, remove book's id from localStorage
 			removeBookId(bookId);
@@ -119,7 +117,7 @@ const SavedBooks = () => {
 										<Card.Text>{book.description}</Card.Text>
 										<Button
 											className="btn-block btn-danger"
-											onClick={() => handleDeleteBook(book.bookId)}
+											onClick={() => handleRemoveBook(book.bookId)}
 										>
 											Delete this Book!
 										</Button>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Container, Col, Form, Button, Card, Row } from 'react-bootstrap';
+import { jwtDecode } from 'jwt-decode';
 
 import Auth from '../utils/auth';
 import { searchGoogleBooks } from '../utils/API';
@@ -18,12 +19,26 @@ const SearchBooks = () => {
 	const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
 	const [saveBook, { error }] = useMutation(SAVE_BOOK);
+	// get token
+	// const token = Auth.loggedIn() ? Auth.getToken() : null;
+
+	// if (!token) {
+	// 	return false;
+	// }
+	// const decoded = jwtDecode(token);
+
+	// console.log('Decoded: ', decoded);
+
+	// const userId = decoded.data._id;
+	// console.log('User ID: ', userId);
 
 	// set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
 	// learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
 	useEffect(() => {
 		return () => saveBookIds(savedBookIds);
-	});
+	}, [savedBookIds]);
+
+	console.log('Saved Book Ids: ', savedBookIds);
 
 	// create method to search for books and set state on form submit
 	const handleFormSubmit = async (event) => {
@@ -59,26 +74,38 @@ const SearchBooks = () => {
 
 	// create function to handle saving a book to our database
 	const handleSaveBook = async (bookId) => {
-		// find the book in `searchedBooks` state by the matching id
-		const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
 
-		// if (!bookToSave || !bookToSave.bookId || !bookToSave.description || !bookToSave.title) {
-		// 	console.error('Missing necessary fields');
-		// 	return;
-		// }
-
-		// get token
 		const token = Auth.loggedIn() ? Auth.getToken() : null;
 
 		if (!token) {
 			return false;
 		}
+		const decoded = jwtDecode(token);
+	
+		console.log('Decoded: ', decoded);
+	
+		const userId = decoded.data._id;
+		console.log('User ID: ', userId);
+
+		
+		// find the book in `searchedBooks` state by the matching id
+		const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+
+		console.log('Book to Save: ', bookToSave);
 
 		try {
 			const { bookId, authors, description, title, image, link } = bookToSave;
-			const response = await saveBook(
+			await saveBook(
 				{
-					variables: { bookId, authors, description, title, image, link },
+					variables: {
+						userId,
+						bookId,
+						authors,
+						description,
+						title,
+						image,
+						link,
+					},
 				},
 				token
 			);
