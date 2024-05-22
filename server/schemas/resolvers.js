@@ -14,10 +14,19 @@ const resolvers = {
 
 	Mutation: {
 		addUser: async (parent, { username, email, password }) => {
-			const user = await User.create({ username, email, password });
-			const token = signToken(user);
+			console.log(`username: ${username}, email: ${email}, password: ${password}`)
 
-			return { token, user };
+			try {
+				const user = await User.create({ username, email, password });
+				console.log('user created: ', user)
+				const token = signToken(user);
+				console.log('token created: ', token);
+
+				return { token, user };
+			} catch (err) {
+				console.log(err.message);
+				throw err
+			}
 		},
 
 		login: async (parent, { email, password }) => {
@@ -65,3 +74,5 @@ const resolvers = {
 		},
 	}
 };
+
+module.exports = resolvers;
