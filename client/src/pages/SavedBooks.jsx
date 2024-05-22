@@ -1,16 +1,33 @@
 import { useState, useEffect } from 'react';
 import { Container, Card, Button, Row, Col } from 'react-bootstrap';
+import { useQuery, useMutation } from '@apollo/client';
+import { jwtDecode } from 'jwt-decode';
 
-import { getMe, deleteBook } from '../utils/API';
 import Auth from '../utils/auth';
-import { removeBookId } from '../utils/localStorage';
 import { GET_ME } from '../utils/queries';
 import { REMOVE_BOOK } from '../utils/mutations';
-
-import { useQuery, useMutation } from '@apollo/client';
+import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
+
+	const token = Auth.loggedIn() ? Auth.getToken() : null;
+	const decoded = jwtDecode(token);
+
+	console.log('Decoded: ', decoded);
+	console.log('User ID: ', decoded.data._id);
+
 	const [userData, setUserData] = useState({});
+	const { loading, data } = useQuery(GET_ME, {
+		variables: { userId: decoded.data._id},
+	});
+
+	useEffect(() => {
+		if (data) {
+			setUserData(data.me);
+		}
+	}, [data]);
+
+	console.log('User Data: ', userData);
 
 	// use this to determine if `useEffect()` hook needs to run again
 	const userDataLength = Object.keys(userData).length;
@@ -41,12 +58,7 @@ const SavedBooks = () => {
 	// }, [userDataLength]);
 
 	// create function that accepts the book's mongo _id value as param and deletes the book from the database
-
-	const { loading, data } = useQuery(GET_ME);
-
-	const [removeBook, { error }] = useMutation(REMOVE_BOOK);
-
-	const handleRemoveBook = async (bookId) => {
+	const handleDeleteBook = async (bookId) => {
 		const token = Auth.loggedIn() ? Auth.getToken() : null;
 
 		if (!token) {
@@ -54,15 +66,14 @@ const SavedBooks = () => {
 		}
 
 		try {
-			const { data, errors } = await removeBook({
-				variables: { bookId: bookId },
-			});
+			const response = await deleteBook(bookId, token);
 
-			if (errors) {
+			if (!response.ok) {
 				throw new Error('something went wrong!');
 			}
 
-			setUserData(data.removeBook);
+			const updatedUser = await response.json();
+			setUserData(updatedUser);
 			// upon success, remove book's id from localStorage
 			removeBookId(bookId);
 		} catch (err) {
@@ -108,7 +119,7 @@ const SavedBooks = () => {
 										<Card.Text>{book.description}</Card.Text>
 										<Button
 											className="btn-block btn-danger"
-											onClick={() => handleRemoveBook(book.bookId)}
+											onClick={() => handleDeleteBook(book.bookId)}
 										>
 											Delete this Book!
 										</Button>

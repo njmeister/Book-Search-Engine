@@ -5,7 +5,6 @@ import { Form, Button, Alert } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
 import { LOGIN_USER } from '../utils/mutations';
 
-import { loginUser } from '../utils/API';
 import Auth from '../utils/auth';
 
 const LoginForm = () => {
@@ -37,6 +36,12 @@ const LoginForm = () => {
 
 			if (error) {
 				throw new Error('something went wrong!');
+			}
+
+			if (!data) {
+				console.log('no data!');
+			} else if (!data.login) {
+				console.log('no data.login!');
 			}
 
 			const { token, user } = await data.login;

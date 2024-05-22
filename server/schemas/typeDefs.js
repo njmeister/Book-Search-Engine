@@ -23,7 +23,7 @@ const typeDefs = `
   }
 
   type Query {
-	me(_id: String!): User
+	me(userId: String!): User
 	users: [User]
   }
 
