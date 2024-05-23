@@ -87,7 +87,7 @@ const SearchBooks = () => {
 		const userId = decoded.data._id;
 		console.log('User ID: ', userId);
 
-		
+
 		// find the book in `searchedBooks` state by the matching id
 		const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
 
@@ -166,6 +166,7 @@ const SearchBooks = () => {
 										<Card.Title>{book.title}</Card.Title>
 										<p className="small">Authors: {book.authors}</p>
 										<Card.Text>{book.description}</Card.Text>
+										<Button onClick={() => window.location.href = `https://www.google.com/books/edition/_/${book.bookId}`}>See on Google</Button>
 										{Auth.loggedIn() && (
 											<Button
 												disabled={savedBookIds?.some(
