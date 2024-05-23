@@ -9,7 +9,6 @@ import { REMOVE_BOOK } from '../utils/mutations';
 import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
-
 	const token = Auth.loggedIn() ? Auth.getToken() : null;
 	const decoded = jwtDecode(token);
 	const userId = decoded.data._id;
@@ -62,10 +61,9 @@ const SavedBooks = () => {
 
 	// create function that accepts the book's mongo _id value as param and deletes the book from the database
 	const handleRemoveBook = async (bookId) => {
-
 		try {
-			const { data }= await removeBook({
-				variables: { userId: userId, bookId: bookId }
+			const { data } = await removeBook({
+				variables: { userId: userId, bookId: bookId },
 			});
 
 			console.log('Data: ', data);
@@ -115,6 +113,13 @@ const SavedBooks = () => {
 										<Card.Title>{book.title}</Card.Title>
 										<p className="small">Authors: {book.authors}</p>
 										<Card.Text>{book.description}</Card.Text>
+										<Button
+											onClick={() =>
+												(window.location.href = `https://www.google.com/books/edition/_/${book.bookId}`)
+											}
+										>
+											See on Google
+										</Button>
 										<Button
 											className="btn-block btn-danger"
 											onClick={() => handleRemoveBook(book.bookId)}
