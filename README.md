@@ -4,7 +4,7 @@
 
 This is my submission for the Book Search Engine challenge in the UTA/EdX Coding Bootcamp. This challenge aimed to transform a RESTful API app to use Apollo Server and GraphQL.
 
-<img src="public/assets/images/portfolio_screenshot.png"/>
+<img src="client/public/ScreenshotHome.png"/>
 
 <a href="https://main--noahmeister.netlify.app/">Link</a>
 
