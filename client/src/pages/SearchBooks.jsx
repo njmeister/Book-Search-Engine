@@ -19,21 +19,7 @@ const SearchBooks = () => {
 	const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
 	const [saveBook, { error }] = useMutation(SAVE_BOOK);
-	// get token
-	// const token = Auth.loggedIn() ? Auth.getToken() : null;
 
-	// if (!token) {
-	// 	return false;
-	// }
-	// const decoded = jwtDecode(token);
-
-	// console.log('Decoded: ', decoded);
-
-	// const userId = decoded.data._id;
-	// console.log('User ID: ', userId);
-
-	// set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
-	// learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
 	useEffect(() => {
 		return () => saveBookIds(savedBookIds);
 	}, [savedBookIds]);
