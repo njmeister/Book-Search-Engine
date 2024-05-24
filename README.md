@@ -6,7 +6,7 @@ This is my submission for the Book Search Engine challenge in the UTA/EdX Coding
 
 <img src="client/public/ScreenshotHome.png"/>
 
-<a href="[https://main--noahmeister.netlify.app/](https://book-search-engine-qp3b.onrender.com/)">Link</a>
+<a href="https://book-search-engine-qp3b.onrender.com/">Link</a>
 
 
 
